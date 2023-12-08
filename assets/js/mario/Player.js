@@ -3,7 +3,7 @@ import Character from './Character.js';
 
 const PlayerAnimation = {
     // Sprite properties
-    scale: 0.33,
+    scale: 0.45,
     width: 256,
     height: 256,
     w: { row: 12, frames: 15 }, // jump key
@@ -77,13 +77,13 @@ export class Player extends Character{
     // Player perform a unique update
     update() {
         if (this.isAnimation(PlayerAnimation.a)) {
-            this.x -= this.speed;  // Move to left
+            this.x -= this.speed * 2;  // Move to left
         }
         if (this.isAnimation(PlayerAnimation.d)) {
-            this.x += this.speed;  // Move to right
+            this.x += this.speed * 2;  // Move to right
         }
         if (this.isGravityAnimation(PlayerAnimation.w)) {
-            this.y -= (GameEnv.bottom * .33);  // jump 33% higher than floor
+            this.y -= (GameEnv.bottom * .5);  // jump 33% higher than floor
         } 
 
         // Perform super update actions

@@ -1,7 +1,6 @@
 export class GameEnv {
     // Prototype static variables
     static gameObjects = [];
-
     static innerWidth;
     static prevInnerWidth;
     static innerHeight;
@@ -41,7 +40,7 @@ export class GameEnv {
         // set bottom of game as background height
         const background = document.querySelector('#background');
         if (background) {
-            this.bottom = background.offsetHeight;
+            this.bottom = 554;
         }
     }
     

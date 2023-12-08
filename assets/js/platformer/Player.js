@@ -1,5 +1,6 @@
 import GameEnv from './GameEnv.js';
 import Character from './Character.js';
+import deathController from './Death.js';
 
 export class Player extends Character{
     // constructors sets up Character object 
@@ -102,10 +103,10 @@ export class Player extends Character{
     // Player updates
     update() {
         if (this.isAnimation("a")) {
-            if (this.movement.left) this.x -= this.speed;  // Move to left
+            if (this.movement.left) this.x -= this.speed * 2;  // Move to left
         }
         if (this.isAnimation("d")) {
-            if (this.movement.right) this.x += this.speed;  // Move to right
+            if (this.movement.right) this.x += this.speed * 2;  // Move to right
         }
         if (this.isGravityAnimation("w")) {
             if (this.movement.down) this.y -= (this.bottom * .33);  // jump 33% higher than bottom
@@ -137,6 +138,23 @@ export class Player extends Character{
             this.movement.right = true;
             this.movement.down = true;
         }
+        // Enemy collision
+        if (this.collisionData.touchPoints.other.id === "enemy") {
+            // Collision with the left side of the Enemy
+            if (this.collisionData.touchPoints.other.left) {
+                // Kill Player (Reset Game)
+            }
+            // Collision with the right side of the Enemy
+            if (this.collisionData.touchPoints.other.right) {
+                deathController.setDeath(1);
+                // Kill Player (Reset Game)
+            }
+            // Collision with the top of the Enemy
+            if (this.collisionData.touchPoints.other.ontop) {
+                // Kill Goomba
+                // Make Mario Bounce
+            }
+          }
     }
     
     // Event listener key down
@@ -174,7 +192,8 @@ export class Player extends Character{
         // Call the parent class's destroy method
         super.destroy();
     }
-}
 
+    
+};
 
 export default Player;
