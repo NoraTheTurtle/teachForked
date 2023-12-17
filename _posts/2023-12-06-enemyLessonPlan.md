@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Lesson for Enemy
-type: ccc
+type: collab
 courses: { csse: {week: 15} }
 ---
 

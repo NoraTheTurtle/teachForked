@@ -16,6 +16,8 @@ export class GameEnv {
     static prevBottom
     static floor;
     static prevFloor;
+    static backgroundSpeed2 = 0;
+    static backgroundSpeed = 0;
 
     // calculated size properties
     static backgroundHeight = 0;
@@ -109,86 +111,107 @@ export class GameEnv {
         this.isInverted = !this.isInverted;  // switch boolean value
     }
 }
-
-//STARTING TIMER
-
 let time = 0; // Initialize time variable
 let timerInterval; // Variable to hold the interval reference
 
 
+
+
 // Function to update and display the timer
 function updateTimer() {
-   time++; // Increment time (you can adjust this based on your game logic)
-
-
-   // Display the updated time in the span element with id 'timeScore'
-   const timeScoreElement = document.getElementById('timeScore');
-   if (timeScoreElement) {
-       timeScoreElement.textContent = time; // Update the displayed time
+   const id = document.getElementById("gameOver");
+   if (id.hidden == false) {
+       stopTimer()
+       time=-1
    }
+  time++; // Increment time (you can adjust this based on your game logic)
+
+
+
+
+  // Display the updated time in the span element with id 'timeScore'
+  const timeScoreElement = document.getElementById('timeScore');
+  if (timeScoreElement) {
+      timeScoreElement.textContent = time; // Update the displayed time
+  }
 }
+
+
 
 
 // Function to start the timer
 function startTimer() {
 
 
-   // Start the timer interval, updating the timer every second (1000 milliseconds)
-   timerInterval = setInterval(updateTimer, 1000);
+
+
+  // Start the timer interval, updating the timer every second (1000 milliseconds)
+  timerInterval = setInterval(updateTimer, 1000);
 }
+
+
+
+
+// Function to stop the timer
+function stopTimer() {  
+   clearInterval(timerInterval); // Clear the interval to stop the timer
+}
+
+
+
+
 // Event listener for the start game button click
 document.getElementById('startGame').addEventListener('click', () => {
-   startTimer(); // Start the timer when the game starts
+  startTimer(); // Start the timer when the game starts
 });
+
+
 
 
 // Function to reset the timer
 function resetTimer() {
-   stopTimer(); // Stop the timer
-   time = 0; // Reset the time variable
-   updateTimer(); // Update the displayed time to show 0
+  stopTimer(); // Stop the timer
+  time = 0; // Reset the time variable
+  updateTimer(); // Update the displayed time to show 0
 }
 
-//STOPING TIMER
 
-// Function to check if the game over screen is visible
-function isGameOverScreenVisible() {
-    const gameOverScreen = document.getElementById("gameOver");
-    return !gameOverScreen.hidden;
-}
 
-// Function to handle visibility changes and stop the timer if game over screen is visible
-function handleVisibilityChange() {
-    if (isGameOverScreenVisible()) {
-        stopTimer();
-    }
-}
-
-// Event listener for visibility change
-document.addEventListener('visibilitychange', handleVisibilityChange);
 
 // Game Over callback
 async function gameOverCallBack() {
-    const id = document.getElementById("gameOver");
-    id.hidden = false;
+  const id = document.getElementById("gameOver");
+  id.hidden = false;
 
-    // Function to stop the timer
-function stopTimer() {
-    clearInterval(timerInterval); // Clear the interval to stop the timer
-    updateTimer(); // update timer to stop
 
-}
-    // Use waitForRestart to wait for the restart button click
-    await waitForButton('restartGame');
-    id.hidden = true;
 
-    // Change currentLevel to start/restart value of null
-    GameEnv.currentLevel = null;
 
-    // Reset the timer when restarting the game
-    resetTimer();
+  // Stop the timer on game over
+  stopTimer();
 
-    return true;
-}
+
+
+
+  // Use waitForRestart to wait for the restart button click
+  await waitForButton('restartGame');
+  id.hidden = true;
+
+
+
+
+  // Change currentLevel to start/restart value of null
+  GameEnv.currentLevel = null;
+
+
+
+
+  // Reset the timer when restarting the game
+  resetTimer();
+
+
+
+
+  return true;
+};
 
 export default GameEnv;

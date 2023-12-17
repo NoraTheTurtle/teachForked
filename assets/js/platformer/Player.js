@@ -1,7 +1,30 @@
 import GameEnv from './GameEnv.js';
 import Character from './Character.js';
 import deathController from './Death.js';
-
+export async function gameOverCallBack() {
+    const id = document.getElementById("gameOver");
+    id.hidden = false;
+   
+   
+    const playerScore = document.getElementById("timeScore").innerHTML
+    const playerName = prompt(`You scored ${playerScore}! What is your name?`)
+    let temp = localStorage.getItem("playerScores")
+   
+   
+    temp += playerName + "," + playerScore.toString() + ";";
+    localStorage.setItem("playerScores", temp)
+   
+   
+    // Use waitForRestart to wait for the restart button click
+    await waitForButton('restartGame');
+    id.hidden = true;
+   
+   
+    // Change currentLevel to start/restart value of null
+    GameEnv.currentLevel = null;
+    return true;
+   }
+   
 export class Player extends Character{
     // constructors sets up Character object 
     constructor(canvas, image, speedRatio, playerData){
@@ -42,6 +65,7 @@ export class Player extends Character{
             this.stashKey = key;
             this.playerData.w = this.playerData.wd;
         }
+        
         // set frame and idle frame
         this.setFrameY(animation.row);
         this.setMaxFrame(animation.frames);
@@ -65,10 +89,11 @@ export class Player extends Character{
     isGravityAnimation(key) {
         var result = false;
     
-        // verify key is in active animations
+        // verify key is in active animation    
         if (key in this.pressedKeys) {
-            result = (!this.isIdle && this.bottom <= this.y);
+            result = (!this.isIdle && (this.topOfPlatform ||this.bottom <= this.y));
         }
+
 
         // scene for on top of tube animation
         if (!this.movement.down) {
@@ -109,7 +134,7 @@ export class Player extends Character{
             if (this.movement.right) this.x += this.speed * 2;  // Move to right
         }
         if (this.isGravityAnimation("w")) {
-            if (this.movement.down) this.y -= (this.bottom * .33);  // jump 33% higher than bottom
+            if (this.movement.down) this.y -= (this.bottom * .43);  // jump __% higher than bottom
         } 
 
         // Perform super update actions
@@ -122,6 +147,7 @@ export class Player extends Character{
             // Collision with the left side of the Tube
             if (this.collisionData.touchPoints.other.left) {
                 this.movement.right = false;
+                
             }
             // Collision with the right side of the Tube
             if (this.collisionData.touchPoints.other.right) {
@@ -137,16 +163,77 @@ export class Player extends Character{
             this.movement.left = true;
             this.movement.right = true;
             this.movement.down = true;
+            //platformO
+            this.topOfPlatform = false;
+            this.movement.left = true;
+            this.movement.right = true;
+            this.movement.down = true;
+            this.gravityEnabled = true;
+
+        if (this.collisionData.touchPoints.other.id === "thing2") {
+             // Collision with the left side of the coin
+            if (this.collisionData.touchPoints.coin.left) {
+                this.touchCoin = true;
+                console.log("o")
+                window.location.reload();
+                gameOverCallBack();
+                this.destroy();
+
+                }
+            // Collision with the right side of the coin
+            if (this.collisionData.touchPoints.coin.right) {
+                console.log("p")
+                this.touchCoin = true;
+                window.location.reload();
+                gameOverCallBack();
+                this.destroy();
+                }
+            } 
+        }
+
+        //platformO
+        if (this.collisionData.touchPoints.other.id === "jumpPlatform") {
+            // Collision with the left side of the Platform
+            console.log("id")
+            if (this.collisionData.touchPoints.other.left && (this.topOfPlatform === true)) {
+                this.movement.right = false;
+                console.log("a")
+            }
+            // Collision with the right side of the platform
+            if (this.collisionData.touchPoints.other.right && (this.topOfPlatform === true)) {
+                this.movement.left = false;
+                console.log("b")
+            }
+            // Collision with the top of the player
+            if (this.collisionData.touchPoints.this.ontop) {
+                this.gravityEnabled = false;
+                console.log("c")
+            }
+            if (this.collisionData.touchPoints.this.bottom) {
+                this.gravityEnabled = false;
+                console.log("d")
+            }
+            if (this.collisionData.touchPoints.this.top) {
+                this.gravityEnabled = false;
+                this.topOfPlatform = true; 
+                console.log(this.topOfPlatform + "top")
+                console.log(this.gravityEnabled + "grav")
+                //console.log("e");
+            }
         }
         // Enemy collision
         if (this.collisionData.touchPoints.other.id === "enemy") {
             // Collision with the left side of the Enemy
             if (this.collisionData.touchPoints.other.left) {
+                gameOverCallBack();
+                this.destroy();
                 // Kill Player (Reset Game)
             }
             // Collision with the right side of the Enemy
             if (this.collisionData.touchPoints.other.right) {
                 deathController.setDeath(1);
+                gameOverCallBack();
+                this.destroy();
                 // Kill Player (Reset Game)
             }
             // Collision with the top of the Enemy
@@ -156,7 +243,6 @@ export class Player extends Character{
             }
           }
     }
-    
     // Event listener key down
     handleKeyDown(event) {
         if (this.playerData.hasOwnProperty(event.key)) {
@@ -166,9 +252,18 @@ export class Player extends Character{
                 this.setAnimation(key);
                 // player active
                 this.isIdle = false;
-            }
-        }
-    }
+            };
+            if (key === "a") {
+                GameEnv.backgroundSpeed2 = -0.1;
+                GameEnv.backgroundSpeed = -0.4;
+            };
+            if (key === "d") {
+                GameEnv.backgroundSpeed2 = 0.1;
+                GameEnv.backgroundSpeed = 0.4;
+
+            };
+        };
+    };
 
     // Event listener key up
     handleKeyUp(event) {
@@ -180,8 +275,18 @@ export class Player extends Character{
             this.setAnimation(key);  
             // player idle
             this.isIdle = true;     
-        }
-    }
+
+            if (key === "a") {
+                GameEnv.backgroundSpeed2 = 0;
+                GameEnv.backgroundSpeed = 0;
+            }
+                if (key === "d") {
+                GameEnv.backgroundSpeed2 = 0;
+                GameEnv.backgroundSpeed = 0; 
+            };
+        };
+    };
+
 
     // Override destroy() method from GameObject to remove event listeners
     destroy() {

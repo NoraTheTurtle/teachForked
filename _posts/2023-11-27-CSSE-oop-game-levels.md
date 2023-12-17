@@ -6,14 +6,12 @@ type: ccc
 courses: { csse: {week: 14}, csp: {week: 14}, csa: {week: 14} }
 image: /images/platformer/backgrounds/hills.png
 ---
-
 <style>
     #gameBegin, #controls, #gameOver {
         position: relative;
         z-index: 2; /*Ensure the controls are on top*/
     }
 </style>
-
 <!-- Prepare DOM elements -->
 <!-- Wrap both the canvas and controls in a container div -->
 <div id="canvasContainer">
@@ -29,23 +27,19 @@ image: /images/platformer/backgrounds/hills.png
         <button id="restartGame">Restart</button>
     </div>
 </div>
-
-<div id="score" style="position: absolute; top: 75px; left: 10px; color: black; font-size: 20px; background-color: white;">
-Time: <span id="timeScore">0</span>
+<div id="score" style= "position: absolute; top: 75px; left: 10px; color: black; font-size: 20px; background-color: white;">
+    Time: <span id="timeScore">0</span>
 </div>
 
 <script type="module">
-
     // Imports
     import GameEnv from '{{site.baseurl}}/assets/js/platformer/GameEnv.js';
     import GameLevel from '{{site.baseurl}}/assets/js/platformer/GameLevel.js';
     import GameControl from '{{site.baseurl}}/assets/js/platformer/GameControl.js';
-
     /*  ==========================================
      *  ======= Data Definitions =================
      *  ==========================================
     */
-
     // Define assets for the game
     var assets = {
       obstacles: {
@@ -55,12 +49,21 @@ Time: <span id="timeScore">0</span>
         grass: { src: "/images/platformer/platforms/grass.png" },
         alien: { src: "/images/platformer/platforms/alien.png" }
       },
+      thing: { //you can call the key value pair anything you want, but we recommmend you call it thing
+        coin: { src: "/images/Coin.png" } //Add this one!
+      },
+      platformO: {
+        grass:{ 
+        src: "/images/brick_wall.png" 
+        },
+      },
       backgrounds: {
         start: { src: "/images/platformer/backgrounds/home.png" },
         hills: { src: "/images/platformer/backgrounds/hills.png" },
+        mountains: { src: "/images/platformer/backgrounds/mountains.jpg"},
         planet: { src: "/images/platformer/backgrounds/planet.jpg" },
         castles: { src: "/images/platformer/backgrounds/castles.png" },
-        end: { src: "/images/platformer/backgrounds/game_over.png" }
+        end: { src: "/images/platformer/backgrounds/game_over.png" },
       },
       players: {
         mario: {
@@ -86,47 +89,84 @@ Time: <span id="timeScore">0</span>
           d: { row: 0, frames: 15, idleFrame: { column: 7, frames: 0 } }
         }
       },
-        enemies:{
-          goomba: {
-            src: "{{site.baseurl}}/images/platformer/sprites/goomba.png",
-            width: 448,
-            height: 452,
-          }
+      enemies: {
+        goomba: {
+          src: "/images/platformer/sprites/goomba.png",
+          width: 357,
+          height: 360,
         }
-      };
- 
-//TESTING CODE!!!!!!!!!!!!!!!!
+      }
+    }
+    if (localStorage.getItem("playerScores") == null){
+     localStorage.setItem("playerScores", "")
+   }
 
-  // Function to switch to the leaderboard screen
-function showLeaderboard() {
-    // Hide game canvas and controls
-    document.getElementById('canvasContainer').style.display = 'none';
-    document.getElementById('controls').style.display = 'none';
 
-    // Create and display leaderboard section
-    const leaderboardSection = document.createElement('div');
-    leaderboardSection.id = 'leaderboardSection';
-    leaderboardSection.innerHTML = '<h1 style="text-align: center; font-size: 18px;">Leaderboard </h1>';
+ // Function to switch to the leaderboard screen
+   function showLeaderboard() {
+     const id = document.getElementById("gameOver");
+     id.hidden = false;
+     // Hide game canvas and controls
+     document.getElementById('canvasContainer').style.display = 'none';
+     document.getElementById('controls').style.display = 'none';
 
-    document.body.appendChild(leaderboardSection);
+
+   // Create and display leaderboard section
+   const leaderboardSection = document.createElement('div');
+   leaderboardSection.id = 'leaderboardSection';
+   leaderboardSection.innerHTML = '<h1 style="text-align: center; font-size: 18px;">Leaderboard </h1>';
+   document.querySelector(".page-content").appendChild(leaderboardSection)
+   // document.body.appendChild(leaderboardSection);
+
+
+   const playerScores = localStorage.getItem("playerScores")
+   const playerScoresArray = playerScores.split(";")
+   const scoresObj = {}
+   const scoresArr = []
+   for(let i = 0; i< playerScoresArray.length-1; i++){
+     const temp = playerScoresArray[i].split(",")
+     scoresObj[temp[0]] = parseInt(temp[1])
+     scoresArr.push(parseInt(temp[1]))
+   }
+
+
+   scoresArr.sort()
+
+
+   const finalScoresArr = []
+   for (let i = 0; i<scoresArr.length; i++) {
+     for (const [key, value] of Object.entries(scoresObj)) {
+       if (scoresArr[i] ==value) {
+         finalScoresArr.push(key + "," + value)
+         break;
+       }
+     }
+   }
+   let rankScore = 1;
+   for (let i =0; i<finalScoresArr.length; i++) {
+     const rank = document.createElement('div');
+     rank.id = `rankScore${rankScore}`;
+     rank.innerHTML = `<h2 style="text-align: center; font-size: 18px;">${finalScoresArr[i]} </h2>`;
+     document.querySelector(".page-content").appendChild(rank)   
+   }
 }
 
-// Event listener for the leaderboard button click
+
+// Event listener for leaderboard button to be clicked
 document.getElementById('leaderboardButton').addEventListener('click', showLeaderboard);
 
 
-    // add File to assets, ensure valid site.baseurl
-    Object.keys(assets).forEach(category => {
-      Object.keys(assets[category]).forEach(assetName => {
-        assets[category][assetName]['file'] = "{{site.baseurl}}" + assets[category][assetName].src;
-      });
-    });
+   // add File to assets, ensure valid site.baseurl
+   Object.keys(assets).forEach(category => {
+     Object.keys(assets[category]).forEach(assetName => {
+       assets[category][assetName]['file'] = "{{site.baseurl}}" + assets[category][assetName].src;
+     });
+   });
 
     /*  ==========================================
      *  ===== Game Level Call Backs ==============
      *  ==========================================
     */
-
     // Level completion tester
     function testerCallBack() {
         // console.log(GameEnv.player?.x)
@@ -136,7 +176,6 @@ document.getElementById('leaderboardButton').addEventListener('click', showLeade
             return false;
         }
     }
-
     // Helper function for button click
     function waitForButton(buttonName) {
       // resolve the button click
@@ -148,41 +187,32 @@ document.getElementById('leaderboardButton').addEventListener('click', showLeade
           waitButton.addEventListener('click', waitButtonListener);
       });
     }
-
     // Start button callback
     async function startGameCallback() {
       const id = document.getElementById("gameBegin");
       id.hidden = false;
-      
       // Use waitForRestart to wait for the restart button click
       await waitForButton('startGame');
       id.hidden = true;
-      
       return true;
     }
-
     // Home screen exits on Game Begin button
     function homeScreenCallback() {
       // gameBegin hidden means game has started
       const id = document.getElementById("gameBegin");
       return id.hidden;
     }
-
     // Game Over callback
     async function gameOverCallBack() {
       const id = document.getElementById("gameOver");
       id.hidden = false;
-      
       // Use waitForRestart to wait for the restart button click
       await waitForButton('restartGame');
       id.hidden = true;
-      
       // Change currentLevel to start/restart value of null
       GameEnv.currentLevel = null;
-
       return true;
     }
-
     /*  ==========================================
      *  ========== Game Level setup ==============
      *  ==========================================
@@ -195,24 +225,18 @@ document.getElementById('leaderboardButton').addEventListener('click', showLeade
     new GameLevel( {tag: "start", callback: startGameCallback } );
     new GameLevel( {tag: "home", background: assets.backgrounds.start, callback: homeScreenCallback } );
     // Game screens
-    new GameLevel( {tag: "hills", background: assets.backgrounds.hills, platform: assets.platforms.grass, player: assets.players.mario, ene: assets.enemies.goomba, tube: assets.obstacles.tube, callback: testerCallBack } );
+    new GameLevel( {tag: "hills", background: assets.backgrounds.hills, background2: assets.backgrounds.mountains, platform: assets.platforms.grass, platformO: assets.platformO.grass, player: assets.players.mario, enemy: assets.enemies.goomba, tube: assets.obstacles.tube, thing: assets.thing.coin, callback: testerCallBack } );
+   //alien lvl
     new GameLevel( {tag: "alien", background: assets.backgrounds.planet, platform: assets.platforms.alien, player: assets.players.monkey, callback: testerCallBack } );
     // Game Over screen
     new GameLevel( {tag: "end", background: assets.backgrounds.end, callback: gameOverCallBack } );
-    //MARIO ENEMIES GAME LVL
-    //adding new game level
-    new GameLevel( {tag: "hills", background: assets.backgrounds.hills, platform: assets.platforms.grass, player: assets.players.mario, enemy: assets.enemies.goomba, tube: assets.obstacles.tube, callback: testerCallBack } );
-
     /*  ==========================================
      *  ========== Game Control ==================
      *  ==========================================
     */
-
     // create listeners
     toggleCanvasEffect.addEventListener('click', GameEnv.toggleInvert);
     window.addEventListener('resize', GameEnv.resize);
-
     // start game
     GameControl.gameLoop();
-
 </script>
