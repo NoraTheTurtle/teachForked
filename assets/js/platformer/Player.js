@@ -19,7 +19,6 @@ export async function gameOverCallBack() {
     await waitForButton('restartGame');
     id.hidden = true;
    
-   
     // Change currentLevel to start/restart value of null
     GameEnv.currentLevel = null;
     return true;
@@ -128,10 +127,10 @@ export class Player extends Character{
     // Player updates
     update() {
         if (this.isAnimation("a")) {
-            if (this.movement.left) this.x -= this.speed * 2;  // Move to left
+            if (this.movement.left) this.x -= this.speed * 4;  // Move to left
         }
         if (this.isAnimation("d")) {
-            if (this.movement.right) this.x += this.speed * 2;  // Move to right
+            if (this.movement.right) this.x += this.speed * 4;  // Move to right
         }
         if (this.isGravityAnimation("w")) {
             if (this.movement.down) this.y -= (this.bottom * .43);  // jump __% higher than bottom
@@ -176,7 +175,6 @@ export class Player extends Character{
                 this.touchCoin = true;
                 console.log("o")
                 window.location.reload();
-                gameOverCallBack();
                 this.destroy();
 
                 }
@@ -185,7 +183,6 @@ export class Player extends Character{
                 console.log("p")
                 this.touchCoin = true;
                 window.location.reload();
-                gameOverCallBack();
                 this.destroy();
                 }
             } 
@@ -225,15 +222,16 @@ export class Player extends Character{
         if (this.collisionData.touchPoints.other.id === "enemy") {
             // Collision with the left side of the Enemy
             if (this.collisionData.touchPoints.other.left) {
-                gameOverCallBack();
+                deathController.setDeath(1);
                 this.destroy();
+                gameOverCallBack();
                 // Kill Player (Reset Game)
             }
             // Collision with the right side of the Enemy
             if (this.collisionData.touchPoints.other.right) {
                 deathController.setDeath(1);
-                gameOverCallBack();
                 this.destroy();
+                gameOverCallBack();
                 // Kill Player (Reset Game)
             }
             // Collision with the top of the Enemy

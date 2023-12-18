@@ -7,9 +7,21 @@ courses: { csse: {week: 14}, csp: {week: 14}, csa: {week: 14} }
 image: /images/platformer/backgrounds/hills.png
 ---
 <style>
-    #gameBegin, #controls, #gameOver {
+    #gameBegin, #controls, #gameOver, #settings {
         position: relative;
         z-index: 2; /*Ensure the controls are on top*/
+    }
+    .sidenav {
+      position: fixed;
+      height: 100%; /* 100% Full-height */
+      width: 0px; /* 0 width - change this with JavaScript */
+      z-index: 3; /* Stay on top */
+      top: 0; /* Stay at the top */
+      left: 0;
+      overflow-x: hidden; /* Disable horizontal scroll */
+      padding-top: 60px; /* Place content 60px from the top */
+      transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+      background-color: black; 
     }
 </style>
 <!-- Prepare DOM elements -->
@@ -23,6 +35,10 @@ image: /images/platformer/backgrounds/hills.png
         <button id="toggleCanvasEffect">Invert</button>
         <button id="leaderboardButton">Leaderboard</button>
     </div>
+      <div id="settings"> <!-- Controls -->
+        <!-- Background controls -->
+        <button id="toggleSettingsBar">Settings</button>
+    </div>
     <div id="gameOver" hidden>
         <button id="restartGame">Restart</button>
     </div>
@@ -30,12 +46,16 @@ image: /images/platformer/backgrounds/hills.png
 <div id="score" style= "position: absolute; top: 75px; left: 10px; color: black; font-size: 20px; background-color: white;">
     Time: <span id="timeScore">0</span>
 </div>
+<div id="mySidebar" class="sidenav">
+  <a href="javascript:void(0)" id="toggleSettingsBar1" class="closebtn">&times;</a>
+</div>
 
 <script type="module">
     // Imports
     import GameEnv from '{{site.baseurl}}/assets/js/platformer/GameEnv.js';
     import GameLevel from '{{site.baseurl}}/assets/js/platformer/GameLevel.js';
     import GameControl from '{{site.baseurl}}/assets/js/platformer/GameControl.js';
+    import Controller from '/teachForked/assets/js/platformer/Controller.js';
     /*  ==========================================
      *  ======= Data Definitions =================
      *  ==========================================
@@ -203,16 +223,38 @@ document.getElementById('leaderboardButton').addEventListener('click', showLeade
       return id.hidden;
     }
     // Game Over callback
-    async function gameOverCallBack() {
-      const id = document.getElementById("gameOver");
-      id.hidden = false;
-      // Use waitForRestart to wait for the restart button click
-      await waitForButton('restartGame');
-      id.hidden = true;
-      // Change currentLevel to start/restart value of null
-      GameEnv.currentLevel = null;
-      return true;
-    }
+export async function gameOverCallBack() {
+  const id = document.getElementById("gameOver");
+  id.hidden = false;
+
+  // Store whether the game over screen has been shown before
+  const gameOverScreenShown = localStorage.getItem("gameOverScreenShown");
+
+  // Check if the game over screen has been shown before
+  if (!gameOverScreenShown) {
+    const playerScore = document.getElementById("timeScore").innerHTML;
+    const playerName = prompt(`You scored ${playerScore}! What is your name?`);
+    let temp = localStorage.getItem("playerScores");
+
+    temp += playerName + "," + playerScore.toString() + ";";
+    localStorage.setItem("playerScores", temp);
+
+    // Set a flag in local storage to indicate that the game over screen has been shown
+    localStorage.setItem("gameOverScreenShown", "true");
+  }
+
+  // Use waitForRestart to wait for the restart button click
+  await waitForButton('restartGame');
+  id.hidden = true;
+
+  // Change currentLevel to start/restart value of null
+  GameEnv.currentLevel = null;
+
+  // Reset the flag so that the game over screen can be shown again on the next game over
+  localStorage.removeItem("gameOverScreenShown");
+
+  return true;
+}
     /*  ==========================================
      *  ========== Game Level setup ==============
      *  ==========================================
@@ -234,9 +276,82 @@ document.getElementById('leaderboardButton').addEventListener('click', showLeade
      *  ========== Game Control ==================
      *  ==========================================
     */
+    var myController = new Controller();
+    myController.initialize();
+
     // create listeners
     toggleCanvasEffect.addEventListener('click', GameEnv.toggleInvert);
     window.addEventListener('resize', GameEnv.resize);
     // start game
     GameControl.gameLoop();
+
+    var table = myController.levelTable;
+document.getElementById("mySidebar").append(table);
+
+    var table = myController.speedDiv;
+document.getElementById("mySidebar").append(table);
+
+var toggle = false;
+  function toggleWidth(){
+    toggle = !toggle;
+    document.getElementById("mySidebar").style.width = toggle?"250px":"0px";
+  }
+  document.getElementById("toggleSettingsBar").addEventListener("click",toggleWidth);
+  document.getElementById("toggleSettingsBar1").addEventListener("click",toggleWidth);
+
+
+
+// Function to clear scores and update leaderboard display
+function clearScores() {
+    // Clear scores in local storage
+    localStorage.removeItem("playerScores");
+
+    // Remove existing leaderboard and recreate it as empty
+    const leaderboardSection = document.getElementById('leaderboardSection');
+    leaderboardSection.innerHTML = '<h1 style="text-align: center; font-size: 18px;">Leaderboard </h1>';
+
+    // Update the leaderboard display
+    const playerScores = localStorage.getItem("playerScores");
+    if (playerScores === null) {
+        return; // No scores to display
+    }
+
+    const playerScoresArray = playerScores.split(";");
+    const scoresObj = {};
+    const scoresArr = [];
+
+    for (let i = 0; i < playerScoresArray.length - 1; i++) {
+        const temp = playerScoresArray[i].split(",");
+        scoresObj[temp[0]] = parseInt(temp[1]);
+        scoresArr.push(parseInt(temp[1]));
+    }
+
+    scoresArr.sort();
+
+    const finalScoresArr = [];
+    for (let i = 0; i < scoresArr.length; i++) {
+        for (const [key, value] of Object.entries(scoresObj)) {
+            if (scoresArr[i] == value) {
+                finalScoresArr.push(key + "," + value);
+                break;
+            }
+        }
+    }
+
+    let rankScore = 1;
+    for (let i = 0; i < finalScoresArr.length; i++) {
+        const rank = document.createElement('div');
+        rank.id = `rankScore${rankScore}`;
+        rank.innerHTML = `<h2 style="text-align: center; font-size: 18px;">${finalScoresArr[i]} </h2>`;
+        leaderboardSection.appendChild(rank);
+    }
+}
+
+// Create a button to clear scores
+const clearScoresButton = document.createElement('button');
+clearScoresButton.innerText = 'Clear';
+clearScoresButton.style.marginTop = '40px'; // Add this line to adjust the top margin
+clearScoresButton.addEventListener('click', clearScores);
+document.querySelector(".page-content").appendChild(clearScoresButton);
+
 </script>
