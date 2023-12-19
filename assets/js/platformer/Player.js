@@ -1,19 +1,10 @@
 import GameEnv from './GameEnv.js';
 import Character from './Character.js';
 import deathController from './Death.js';
+
 export async function gameOverCallBack() {
     const id = document.getElementById("gameOver");
     id.hidden = false;
-   
-   
-    const playerScore = document.getElementById("timeScore").innerHTML
-    const playerName = prompt(`You scored ${playerScore}! What is your name?`)
-    let temp = localStorage.getItem("playerScores")
-   
-   
-    temp += playerName + "," + playerScore.toString() + ";";
-    localStorage.setItem("playerScores", temp)
-   
    
     // Use waitForRestart to wait for the restart button click
     await waitForButton('restartGame');
@@ -231,7 +222,6 @@ export class Player extends Character{
             if (this.collisionData.touchPoints.other.right) {
                 deathController.setDeath(1);
                 this.destroy();
-                gameOverCallBack();
                 // Kill Player (Reset Game)
             }
             // Collision with the top of the Enemy

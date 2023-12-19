@@ -94,7 +94,7 @@ image: /images/platformer/backgrounds/hills.png
           wa: { row: 11, frames: 15 },
           wd: { row: 10, frames: 15 },
           a: { row: 3, frames: 7, idleFrame: { column: 7, frames: 0 } },
-          s: {  },
+          s: { row: 12, frames: 15 },
           d: { row: 2, frames: 7, idleFrame: { column: 7, frames: 0 } }
         },
         monkey: {
@@ -134,7 +134,9 @@ image: /images/platformer/backgrounds/hills.png
    // Create and display leaderboard section
    const leaderboardSection = document.createElement('div');
    leaderboardSection.id = 'leaderboardSection';
-   leaderboardSection.innerHTML = '<h1 style="text-align: center; font-size: 18px;">Leaderboard </h1>';
+   leaderboardSection.innerHTML = '<h1 style="text-align: center; font-size: 18px; color: white;">Leaderboard </h1>';
+  leaderboardSection.style.backgroundColor = 'blue';
+
    document.querySelector(".page-content").appendChild(leaderboardSection)
    // document.body.appendChild(leaderboardSection);
 
