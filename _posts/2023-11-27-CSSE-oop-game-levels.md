@@ -56,6 +56,7 @@ image: /images/platformer/backgrounds/hills.png
     import GameLevel from '{{site.baseurl}}/assets/js/platformer/GameLevel.js';
     import GameControl from '{{site.baseurl}}/assets/js/platformer/GameControl.js';
     import Controller from '/teachForked/assets/js/platformer/Controller.js';
+
     /*  ==========================================
      *  ======= Data Definitions =================
      *  ==========================================
@@ -82,6 +83,7 @@ image: /images/platformer/backgrounds/hills.png
         hills: { src: "/images/platformer/backgrounds/hills.png" },
         mountains: { src: "/images/platformer/backgrounds/mountains.jpg"},
         planet: { src: "/images/platformer/backgrounds/planet.jpg" },
+        classroom: { src: "/images/platformer/backgrounds/classroom.jpg"},
         castles: { src: "/images/platformer/backgrounds/castles.png" },
         end: { src: "/images/platformer/backgrounds/game_over.png" },
       },
@@ -107,7 +109,18 @@ image: /images/platformer/backgrounds/hills.png
           a: { row: 1, frames: 15, idleFrame: { column: 7, frames: 0 } },
           s: { row: 12, frames: 15 },
           d: { row: 0, frames: 15, idleFrame: { column: 7, frames: 0 } }
-        }
+        },
+        lopez: {
+          src: "/images/platformer/sprites/lopezanimation.png", // Modify this to match your file path
+          width: 46,
+          height: 52.5,
+          idle: { row: 6, frames: 1, idleFrame: {column: 1, frames: 0} },
+          a: { row: 1, frames: 3, idleFrame: { column: 1, frames: 0 } }, // Right Movement
+          d: { row: 2, frames: 3, idleFrame: { column: 1, frames: 0 } }, // Left Movement 
+          runningLeft: { row: 5, frames: 3, idleFrame: {column: 1, frames: 0} },
+          runningRight: { row: 4, frames: 3, idleFrame: {column: 1, frames: 0} },
+          s: {}, // Stop the movement 
+        },
       },
       enemies: {
         goomba: {
@@ -272,8 +285,11 @@ export async function gameOverCallBack() {
     new GameLevel( {tag: "hills", background: assets.backgrounds.hills, background2: assets.backgrounds.mountains, platform: assets.platforms.grass, platformO: assets.platformO.grass, player: assets.players.mario, enemy: assets.enemies.goomba, tube: assets.obstacles.tube, thing: assets.thing.coin, callback: testerCallBack } );
    //alien lvl
     new GameLevel( {tag: "alien", background: assets.backgrounds.planet, platform: assets.platforms.alien, player: assets.players.monkey, callback: testerCallBack } );
+    //lopes lvl
+    new GameLevel( {tag: "lopez", background: assets.backgrounds.classroom, player: assets.players.lopez, callback: testerCallBack } );
     // Game Over screen
     new GameLevel( {tag: "end", background: assets.backgrounds.end, callback: gameOverCallBack } );
+    
     /*  ==========================================
      *  ========== Game Control ==================
      *  ==========================================

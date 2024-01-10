@@ -1,4 +1,3 @@
-//
 let death = 0;
 
 const deathController = {
