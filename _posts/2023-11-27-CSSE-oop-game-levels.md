@@ -127,7 +127,12 @@ image: /images/platformer/backgrounds/hills.png
           src: "/images/platformer/sprites/goomba.png",
           width: 357,
           height: 360,
-        }
+        },
+        rock: {
+          src: "/images/platformer/sprites/rock.png",
+          width: 462,
+          height: 335,
+        },
       }
     }
     if (localStorage.getItem("playerScores") == null){
@@ -191,12 +196,12 @@ image: /images/platformer/backgrounds/hills.png
 document.getElementById('leaderboardButton').addEventListener('click', showLeaderboard);
 
 
-   // add File to assets, ensure valid site.baseurl
-   Object.keys(assets).forEach(category => {
-     Object.keys(assets[category]).forEach(assetName => {
-       assets[category][assetName]['file'] = "{{site.baseurl}}" + assets[category][assetName].src;
-     });
-   });
+  // add File to assets, ensure valid site.baseurl
+  Object.keys(assets).forEach(category => {
+    Object.keys(assets[category]).forEach(assetName => {
+      assets[category][assetName]['file'] = "{{site.baseurl}}" + assets[category][assetName].src;
+    });
+  });
 
     /*  ==========================================
      *  ===== Game Level Call Backs ==============
@@ -286,7 +291,7 @@ export async function gameOverCallBack() {
    //alien lvl
     new GameLevel( {tag: "alien", background: assets.backgrounds.planet, platform: assets.platforms.alien, player: assets.players.monkey, callback: testerCallBack } );
     //lopes lvl
-    new GameLevel( {tag: "lopez", background: assets.backgrounds.classroom, player: assets.players.lopez, callback: testerCallBack } );
+    new GameLevel( {tag: "lopez", background: assets.backgrounds.classroom, player: assets.players.lopez, enemy: assets.enemies.rock, callback: testerCallBack } );
     // Game Over screen
     new GameLevel( {tag: "end", background: assets.backgrounds.end, callback: gameOverCallBack } );
     
@@ -313,7 +318,7 @@ var toggle = false;
   function toggleWidth(){
     toggle = !toggle;
     document.getElementById("mySidebar").style.width = toggle?"250px":"0px";
-  }
+  };
   document.getElementById("toggleSettingsBar").addEventListener("click",toggleWidth);
   document.getElementById("toggleSettingsBar1").addEventListener("click",toggleWidth);
 

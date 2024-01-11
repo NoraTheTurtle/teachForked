@@ -5,6 +5,7 @@ import PlatformO from './PlatformO.js';
 import Player from './Player.js';
 import Tube from './Tube.js';
 import Enemy from './Enemy.js';
+import Mort from './Mort.js';
 import Thing1 from './Thing1.js';
 import Background2 from './Background2.js';
 

@@ -11,7 +11,7 @@ export async function gameOverCallBack() {
     id.hidden = true;
    
     // Change currentLevel to start/restart value of null
-    GameEnv.currentLevel = null;
+    GameEnv.currentLevel = "hills";
     return true;
    }
    
@@ -298,7 +298,6 @@ export class Player extends Character{
         };
         if (event.key === "f") {
                 this.canvas.style.filter = 'invert(0)'; //revert to default coloring
-                this.speed = this.speed - 5;
         }
     };
 
